@@ -30,12 +30,12 @@ app.get('/', (req, res) => {
       console.log(info.fileType);
       res.json(info)
   })
-  if(!res.headersSent) res.json({}, 0, 500);
+  // if(!res.headersSent) res.json({}, 0, 500);
   setTimeout(() => {
     var filename = 'base64.txt';
     fs.readFile(filename, 'utf8', function(err, data) {
       if (err) throw err;
-      console.log('OK: ' + filename);
+      console.log('OK: ' + data);
 
       console.log(data)
       console.log('getFile');
