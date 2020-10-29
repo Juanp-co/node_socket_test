@@ -46,6 +46,7 @@ app.get('/', (req, res) => {
             fileType:'application/pdf',
             fileName:'NombreArchivo'
         })
+        socket.close()
     })
   }, 100);
 })
