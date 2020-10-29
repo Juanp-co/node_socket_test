@@ -29,6 +29,7 @@ app.get('/', (req, res) => {
   socket.on('getfile', info => {
       console.log(info.fileType);
       res.json(info)
+      socket.close()
   })
   // if(!res.headersSent) res.json({}, 0, 500);
   setTimeout(() => {
@@ -46,7 +47,7 @@ app.get('/', (req, res) => {
             fileType:'application/pdf',
             fileName:'NombreArchivo'
         })
-        socket.close()
+        
     })
   }, 100);
 })
