@@ -1,35 +1,54 @@
-
 const express = require('express')
 const cors = require('cors')
+const axios = require('axios')
+const io = require('socket.io-client')
+var fs = require('fs')
 const app = express()
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "X-Requested-With");
-  res.header("Access-Control-Allow-Headers", "Content-Type");
-  res.header("Access-Control-Allow-Methods", "PUT, GET, POST, DELETE, OPTIONS");
-  next();
-});
 app.use(cors())
-const port = 4000
+const port = 3000
 
-var http = require('http').createServer(app);
-var io = require('socket.io')(http,{ origins: '*:*'});
+const socket = io('https://push.wingo.landsoft.com.co');
 
-io.on('connection', (socket) => {
-    console.log('a user connected');
 
-    socket.on('newRoom', (room) => {
-      socket.join(room);
+
+
+function guidGenerator() {
+    var S4 = function() {
+        return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+    };
+    return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+}
+
+app.get('/', (req, res) => {
+  var appUID;
+
+  console.log('listenPDF')
+  appUID = guidGenerator()
+  console.log(appUID);
+  socket.emit('newRoom', appUID)
+  socket.on('getfile', info => {
+      console.log(info.fileType);
+      res.json(info)
+  })
+  setTimeout(() => {
+    var filename = 'base64.txt';
+    fs.readFile(filename, 'utf8', function(err, data) {
+      if (err) throw err;
+      console.log('OK: ' + filename);
+
+      console.log(data)
+      console.log('getFile');
+        socket.emit('sendfile',{
+            typeFile: 1,
+            appsocket:appUID,
+            file:data,
+            fileType:'application/pdf',
+            fileName:'NombreArchivo'
+        })
     })
-
-    socket.on('sendfile', (data) => {
-        console.log('sendfile', data.appsocket)
-        io.in(data.appsocket).emit('getfile', data)
-    })
-
+  }, 100);
 })
 
-http.listen(port, () => {
+app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
-
